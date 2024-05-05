@@ -1,38 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-
     public bool gravity = true; //true == normal gravity, false == reverse gravity
     public float playerSpeed = 3f;
+    public float fallSpeed = 20f;
     public Rigidbody2D rb;
+    private bool gravitySwitched = false;
 
-
-    //is called before first frame
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0;
+        float initialFallSpeed = gravity ? -fallSpeed : fallSpeed;
+        rb.velocity = new Vector2(playerSpeed, initialFallSpeed);
     }
 
-    //is called once per frame, used to check for input
     void Update()
     {   
         rb.velocity = new Vector2(playerSpeed, rb.velocity.y);
 
         if (Input.GetKeyDown(KeyCode.G))
         {
-            if (gravity)
+            gravity = !gravity;
+            if (gravitySwitched)
             {
-                gravity = false;
-                Physics2D.gravity = new Vector2(0, -20f);
+                rb.velocity = Vector2.zero;
             }
-            else
-            {
-                gravity = true;
-                Physics2D.gravity = new Vector2(0, 20f);
-            }
+            float currentFallSpeed = gravity ? -fallSpeed : fallSpeed;
+            rb.velocity = new Vector2(rb.velocity.x, currentFallSpeed);
+            gravitySwitched = true;
         }
     }
 }
